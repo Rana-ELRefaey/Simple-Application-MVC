@@ -1,0 +1,189 @@
+﻿@model  ItemsViewModel
+
+@{
+	ViewBag.Title = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	//var categoriesList = new SelectList(Model.categories.ToList<Category>(), null, "CategoryID", "Name");
+}
+
+<h2>All Items</h2>
+<div>
+	@Html.ActionLink("Export Item Report", "ExportItem",null ,new { @class = "btn btn-dark btn-sm" })
+</div>
+<div>
+	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+		Add New Item
+	</button>
+</div>
+
+<table class="table">
+
+	<thead class="thead-dark">
+		<tr>
+			<th>Item Name</th>
+			<th>Units</th>
+			<th>Unit Price</th>
+			<th>Quantity</th>
+			<th>Category Name</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody id="tbody">
+		@foreach (var item in ViewBag.x  as List<ItemsViewModelIndex>)
+		{
+			<tr id="@item.ItemID">
+				<td>@item.Name</td>
+				<td>@item.Units</td>
+				<td>@item.PricePerUnit</td>
+				<td>@item.Quantity</td>
+				<td>@item.Category</td>
+				<td>
+					@Html.ActionLink("Update", "Edit", new { id = item.ItemID }, new { @class = "btn btn-success btn-sm" }) 
+					@Html.ActionLink("Details", "Details", new { id = item.ItemID }, new { @class = "btn btn-info btn-sm" }) 
+					<button name="name" value="Delete" class="btn btn-danger btn-sm" onclick="OnDeleteClick(@item.ItemID)">Delete</button>
+				</td>
+			</tr>
+		}
+	</tbody>
+
+</table>
+
+
+
+@*@{
+	AjaxOptions ajaxOptions = new AjaxOptions
+	{
+		HttpMethod = "POST",
+		OnSuccess = "OnSuccess()",
+		InsertionMode = InsertionMode.InsertAfter,
+		UpdateTargetId = "tbody"
+
+	};
+}*@
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+
+		<form id="Myform">
+			@*@Html.AntiForgeryToken()*@
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLongTitle">Add New Item</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-horizontal">
+
+						@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+						<div class="form-group">
+							@Html.LabelFor(model => model.item.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-10">
+								@Html.EditorFor(model => model.item.Name, new { htmlAttributes = new { @class = "form-control" } })
+								@Html.ValidationMessageFor(model => model.item.Name, "", new { @class = "text-danger" })
+							</div>
+						</div>
+
+						<div class="form-group">
+							@Html.LabelFor(model => model.item.Units, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-10">
+								@Html.EditorFor(model => model.item.Units, new { htmlAttributes = new { @class = "form-control" } })
+								@Html.ValidationMessageFor(model => model.item.Units, "", new { @class = "text-danger" })
+							</div>
+						</div>
+
+						<div class="form-group">
+							@Html.LabelFor(model => model.item.PricePerUnit, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-10">
+								@Html.EditorFor(model => model.item.PricePerUnit, new { htmlAttributes = new { @class = "form-control" } })
+								@Html.ValidationMessageFor(model => model.item.PricePerUnit, "", new { @class = "text-danger" })
+							</div>
+						</div>
+
+						<div class="form-group">
+							@Html.LabelFor(model => model.item.Quantity, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-10">
+								@Html.EditorFor(model => model.item.Quantity, new { htmlAttributes = new { @class = "form-control" } })
+								@Html.ValidationMessageFor(model => model.item.Quantity, "", new { @class = "text-danger" })
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label>Category Name</label>
+							<div class="col-md-10">
+								@*@Html.DropDownListFor(x=>x.cate.CategoryID ,categoriesList , "--Select Category--" , new {@class ="btn btn-secondary dropdown-toggle" })*@
+								@Html.DropDownListFor(m => m.cate.CategoryID, ViewBag.categoriesList as SelectList, "--Select Category--", new { @class = "btn btn-secondary dropdown-toggle" })
+							</div>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary btn-save">Add</button>
+					</div>
+
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+@section scripts{
+	<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+	<script>
+		function OnDeleteClick(id) {
+			let res = confirm("Are You Sure To Delete This ?!");
+			if (res) {
+				$.ajax({
+					url: `/Items/Delete/${id}`,
+					type: "GET",
+					success: function (res) {
+						if (res) {
+							$("#" + id).remove();
+						}
+						else {
+							alert("Invalid Item");
+						}
+					},
+					error: function (xhr, s, err) {
+						alert("An Error Occured !!..");
+					}
+				});
+			}
+		}
+
+		function OnSuccess() {
+			$('#exampleModalCenter').modal('hide')
+		}
+
+
+		$(".btn-save").click(function () {
+			var data = $("#Myform").serialize();
+			debugger 
+			var CategoryID = $("#cate_CategoryID").val(); 
+
+			$.ajax({
+				url: "/Items/Create?CategoryID="+ CategoryID,
+				type: "Post",
+				data: data,
+				success: function () {
+					debugger
+					  window.location.href = "/Items/index";
+					$('#exampleModalCenter').modal('hide')
+					//location.reload(true);
+                   
+
+				}
+
+
+			})
+
+
+		})
+
+	</script>
+}

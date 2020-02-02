@@ -1,0 +1,135 @@
+﻿@model CategoryViewModel
+
+@{
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewBag.Title = "Index";
+}
+
+<h2>All Categories</h2>
+
+<div>
+	@Html.ActionLink("Export Category Report", "ExportCategory", null, new { @class = "btn btn-dark btn-sm" })
+</div>
+<div>
+	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+		Create Category
+	</button>
+</div>
+
+<table class="table">
+	<thead class="thead-dark">
+		<tr>
+			<th>Category Name</th>
+			<th>Category Place</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody id="tbody">
+		@foreach (var item in Model.categories)
+		{
+			<tr id="@item.CategoryID">
+				<td>@item.Name</td>
+				<td>@item.Place</td>
+				<td>
+					@Html.ActionLink("Update", "Edit", new { id = item.CategoryID }, new { @class = "btn btn-success btn-sm" })
+					@Html.ActionLink("Details", "Details", new { id = item.CategoryID }, new { @class = "btn btn-info btn-sm" })
+					<button name="name" value="Delete" class="btn btn-danger btn-sm" onclick="OnDeleteClick(@item.CategoryID)">Delete</button>
+				</td>
+			</tr>
+		}
+	</tbody>
+
+</table>
+
+
+@{
+	AjaxOptions ajaxOptions = new AjaxOptions
+	{
+		HttpMethod = "POST",
+		OnSuccess = "OnSuccess",
+		InsertionMode = InsertionMode.InsertAfter,
+		UpdateTargetId = "tbody"
+
+	};
+}
+
+
+<!-- Modal Add New Category -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+
+		@using (Ajax.BeginForm("Create", "Categories", ajaxOptions))
+		{
+			@*@Html.AntiForgeryToken()*@
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLongTitle">Add Category</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-horizontal">
+
+						@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+						<div class="form-group">
+							@Html.LabelFor(model => model.category.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-10">
+								@Html.EditorFor(model => model.category.Name, new { htmlAttributes = new { @class = "form-control" } })
+								@Html.ValidationMessageFor(model => model.category.Name, "", new { @class = "text-danger" })
+							</div>
+						</div>
+
+						<div class="form-group">
+							@Html.LabelFor(model => model.category.Place, htmlAttributes: new { @class = "control-label col-md-2" })
+							<div class="col-md-10">
+								@Html.EditorFor(model => model.category.Place, new { htmlAttributes = new { @class = "form-control" } })
+								@Html.ValidationMessageFor(model => model.category.Place, "", new { @class = "text-danger" })
+							</div>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+						<button type="submit" class="btn btn-primary">Add</button>
+					</div>
+
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+
+
+@section scripts{
+	<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+	<script>
+		function OnDeleteClick(id) {
+			let res = confirm("Are You Sure To Delete This ?!");
+			if (res) {
+				$.ajax({
+					url: `/Categories/Delete/${id}`,
+					type: "GET",
+					success: function (res) {
+						if (res) {
+							$("#" + id).remove();
+						}
+						else {
+							alert("Invalid Category");
+						}
+					},
+					error: function (xhr, s, err) {
+						alert("An Error Occured");
+					}
+				});
+			}
+		}
+
+		function OnSuccess() {
+			$('#exampleModalCenter').modal('hide')
+		}
+
+	</script>
+}

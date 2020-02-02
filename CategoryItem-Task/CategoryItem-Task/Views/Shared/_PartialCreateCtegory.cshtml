@@ -1,0 +1,11 @@
+﻿@model Category
+
+<tr id="@Model.CategoryID">
+	<td>@Model.Name</td>
+	<td>@Model.Place</td>
+	<td>
+		@Html.ActionLink("Update", "Edit", new { id = Model.CategoryID }, new { @class = "btn btn-success btn-sm" })
+		@Html.ActionLink("Details", "Details", new { id = Model.CategoryID }, new { @class = "btn btn-info btn-sm" })
+		<button class="btn btn-danger btn-sm" onclick="OnDeleteClick(@Model.CategoryID)">Delete</button>
+	</td>
+</tr>

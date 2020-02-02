@@ -1,0 +1,31 @@
+﻿@model CategoryItem_Task.Models.Item
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@Model.Name Details</h2>
+<div>
+	<table class="table">
+		<tr>
+			<td>Item Name</td>
+			<td>@Model.Name</td>
+		</tr>
+		<tr>
+			<td>Units</td>
+			<td>@Model.Units</td>
+		</tr>
+		<tr>
+			<td>Unit Price</td>
+			<td>@Model.PricePerUnit</td>
+		</tr>
+		<tr>
+			<td>Category Name</td>
+			<td>@Model.Category.Name</td>
+		</tr>
+	</table>
+	@Html.ActionLink("Edit", "Edit", new { id = Model.ItemID }, new { @class = "btn btn-success" })
+	@Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-dark" })
+</div>
+
